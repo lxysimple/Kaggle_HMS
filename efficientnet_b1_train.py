@@ -455,9 +455,16 @@ def objective(trial) -> float:
 
                 print(f'epoch:{epoch}, idx:{idx:6d}, loss:{loss:.6f}') 
 
+                with open("log.txt", "a") as f:
+                    print(f'epoch:{epoch}, idx:{idx:6d}, loss:{loss:.6f}', file=f)
+
+
             epoch_train_loss = np.mean(train_loss)
             train_losses.append(epoch_train_loss)
             print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Epoch {epoch + 1}: Train Loss = {epoch_train_loss:.2f}")
+            with open("log.txt", "a") as f:
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Epoch {epoch + 1}: Train Loss = {epoch_train_loss:.2f}", file=f)
+
 
             if scheduler_name == "CosineAnnealingLR":
                 scheduler.step()
@@ -484,6 +491,9 @@ def objective(trial) -> float:
             epoch_val_loss = np.mean(val_loss)
             val_losses.append(epoch_val_loss)
             print(f" Epoch {epoch + 1}: Test Loss = {epoch_val_loss:.2f}")
+            with open("log.txt", "a") as f:
+                print(f" Epoch {epoch + 1}: Test Loss = {epoch_val_loss:.2f}", file=f)
+
             
             if scheduler_name == "ReduceLROnPlateau":
                     scheduler.step(epoch_val_loss)
@@ -501,6 +511,9 @@ def objective(trial) -> float:
                     raise optuna.TrialPruned()
         
         print(f"Fold {fold + 1} Best Test Loss: {best_val_loss:.2f}")
+        with open("log.txt", "a") as f:
+            print(f"Fold {fold + 1} Best Test Loss: {best_val_loss:.2f}", file=f)
+
     
     return best_val_loss
 
