@@ -355,7 +355,9 @@ def objective(trial) -> float:
         # ckpt = torch.load(f'/home/xyli/kaggle/Kaggle_HMS/efficientnet_b1_fold{fold}.pth')
         # model.load_state_dict(ckpt, strict=False)
 
-        state_dict = torch.load(f'/home/xyli/kaggle/Kaggle_HMS/efficientnet_b1_fold{fold}.pth')  # 模型pth文件
+        
+        state_dict = torch.load(f'/home/xyli/kaggle/efficientnet_b1_fold{fold}.pth') 
+        # state_dict = torch.load(f'/home/xyli/kaggle/Kaggle_HMS/efficientnet_b1_fold{fold}.pth')  # 模型pth文件
         new_state_dict = OrderedDict()
         for k, v in state_dict.items():
             name = k[7:]  # 去掉前缀（去掉前七个字符）
