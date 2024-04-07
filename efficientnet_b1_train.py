@@ -305,7 +305,7 @@ def mixup_criterion(preds1, targets):
     return lam * kl_loss(targets1 ,preds1) + (1 - lam) * kl_loss(targets2 ,preds1)
 
 
-def get_fold_train_val_indexes(indexes: np.ndarray, fold: int) -> tuple[np.ndarray, np.ndarray]:
+def get_fold_train_val_indexes(indexes: np.ndarray, fold: int) -> Tuple[np.ndarray, np.ndarray]:
     lower_bound = fold * len(indexes) // Config.num_folds
     upper_bound = (fold + 1) * len(indexes) // Config.num_folds
     
