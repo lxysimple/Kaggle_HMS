@@ -20,6 +20,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR, ReduceLROnPlateau
 # 导入 PyTorch 的 DataParallel 模块
 from torch.nn.parallel import DataParallel # 单机多卡的分布式训练（数据并行） 模型训练加速
 
+from datetime import datetime
 
 warnings.filterwarnings('ignore', category=Warning)
 gc.collect()
@@ -379,7 +380,7 @@ def objective(trial) -> float:
             np.random.shuffle(random_num)
             train_idx = train_idx[random_num]
 
-            print(f"  Train - {len(train_idx)} indexes")
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  Train - {len(train_idx)} indexes")
             for idx in range(0, len(train_idx), Config.batch_size):
                 optimizer.zero_grad()
 
@@ -441,7 +442,7 @@ def objective(trial) -> float:
 
             epoch_train_loss = np.mean(train_loss)
             train_losses.append(epoch_train_loss)
-            print(f" Epoch {epoch + 1}: Train Loss = {epoch_train_loss:.2f}")
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Epoch {epoch + 1}: Train Loss = {epoch_train_loss:.2f}")
 
             if scheduler_name == "CosineAnnealingLR":
                 scheduler.step()
