@@ -2,7 +2,7 @@ import gc
 import os
 import random
 import warnings
-from IPython.display import display
+# from IPython.display import display
 
 import numpy as np
 import pandas as pd
@@ -129,7 +129,7 @@ def extract_features(input_data: pd.DataFrame) -> pd.DataFrame:
     return feature_df
 
 train_features = extract_features(train_df)
-display(train_features)
+# display(train_features)
     
 gc.collect()
 
