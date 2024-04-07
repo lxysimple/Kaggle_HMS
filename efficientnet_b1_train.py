@@ -342,7 +342,7 @@ def objective(trial) -> float:
 
         model = timm.create_model(
             'efficientnet_b1', 
-            pretrained=True, 
+            pretrained=False, 
             num_classes=6, 
             in_chans=1, 
             drop_rate=dropout
