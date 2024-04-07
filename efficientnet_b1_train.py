@@ -221,7 +221,7 @@ Config.dataset_wide_mean:  -0.2972692229201065
 Config.dataset_wide_std:  2.5997336315611026
 """
 
-Config.dataset_wide_mean = -0.2972692229201065
+# Config.dataset_wide_mean = -0.2972692229201065
 # Config.dataset_wide_std = 2.5997336315611026
 # print('Config.dataset_wide_mean: ', Config.dataset_wide_mean)
 # print('Config.dataset_wide_std: ', Config.dataset_wide_std)
