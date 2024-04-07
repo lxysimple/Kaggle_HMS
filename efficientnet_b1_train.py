@@ -205,11 +205,11 @@ def get_batch(paths, lowpass, highpass, normalization_dataset_wide):
     return batch_data
 
 
-print("Calculating dataset-wide mean...")
-Config.dataset_wide_mean = get_dataset_wide_mean(train_features[["path"]].values, HyperparameterPreset.lowpass, HyperparameterPreset.highpass)
-print("Finished mean calculation!\nCalculating dataset-wide standard deviation...")
-Config.dataset_wide_std = get_dataset_wide_std(train_features[["path"]].values, HyperparameterPreset.lowpass, HyperparameterPreset.highpass)
-print("Finished standard deviation calculation!")
+# print("Calculating dataset-wide mean...")
+# Config.dataset_wide_mean = get_dataset_wide_mean(train_features[["path"]].values, HyperparameterPreset.lowpass, HyperparameterPreset.highpass)
+# print("Finished mean calculation!\nCalculating dataset-wide standard deviation...")
+# Config.dataset_wide_std = get_dataset_wide_std(train_features[["path"]].values, HyperparameterPreset.lowpass, HyperparameterPreset.highpass)
+# print("Finished standard deviation calculation!")
 
 
 
@@ -221,8 +221,8 @@ Config.dataset_wide_mean:  -0.2972692229201065
 Config.dataset_wide_std:  2.5997336315611026
 """
 
-# Config.dataset_wide_mean = -0.2972692229201065
-# Config.dataset_wide_std = 2.5997336315611026
+Config.dataset_wide_mean = -0.2972692229201065
+Config.dataset_wide_std = 2.5997336315611026
 print('Config.dataset_wide_mean: ', Config.dataset_wide_mean)
 print('Config.dataset_wide_std: ', Config.dataset_wide_std)
 
