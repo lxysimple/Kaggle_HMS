@@ -92,7 +92,7 @@ gc.collect()
 
 
 
-train_df = pd.read_csv("/home/xyli/kaggle/hms-harmful-brain-activity-classification/train.csv")
+train_df = pd.read_csv("/home/xyli/kaggle/train.csv")
 
 def extract_vote_count_features(input_data: pd.DataFrame) -> pd.DataFrame:
     label_votes = pd.DataFrame()
@@ -124,7 +124,7 @@ def extract_features(input_data: pd.DataFrame) -> pd.DataFrame:
         feature_df[f'{label}_vote'] = feature_df[f'{label}_vote_sum'] / feature_df['total_vote']
         
     feature_df = feature_df[choose_cols]
-    feature_df['path'] = feature_df['spectrogram_id'].apply(lambda x: "/home/xyli/kaggle/hms-harmful-brain-activity-classification/train_spectrograms/" + str(x) + ".parquet")
+    feature_df['path'] = feature_df['spectrogram_id'].apply(lambda x: "/home/xyli/kaggle/train_spectrograms/" + str(x) + ".parquet")
     
     return feature_df
 
