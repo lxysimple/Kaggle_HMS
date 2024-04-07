@@ -22,7 +22,7 @@ from torch.nn.parallel import DataParallel # 单机多卡的分布式训练（�
 
 from datetime import datetime
 
-import collections
+from collections import OrderedDict
 
 warnings.filterwarnings('ignore', category=Warning)
 gc.collect()
