@@ -30,7 +30,7 @@ labels = ['seizure', 'lpd', 'gpd', 'lrda', 'grda', 'other']
 class Config:
     seed = 3131
     image_transform = transforms.Resize((512,512))
-    batch_size = 96
+    batch_size = 110
     num_epochs = 9
     num_folds = 5
     num_trials = 20
@@ -216,7 +216,85 @@ print('Config.dataset_wide_mean: ', Config.dataset_wide_mean)
 print('Config.dataset_wide_std: ', Config.dataset_wide_std)
 
 
-def get_fold_train_val_indexes(indexes: np.ndarray, fold: int) -> Tuple[np.ndarray, np.ndarray]:
+
+# size是图片的shape，即（b,c,w,h）
+# lam 参数的作用是调整融合区域的大小，lam 越接近 1，融合框越小，融合程度越低
+# 返回一个随机生成的矩形框，用于确定两张图像的融合区域
+def rand_bbox(size, lam):
+    W = size[2]
+    H = size[3]
+    cut_rat = np.sqrt(1. - lam)
+    cut_w = int(W * cut_rat)
+    cut_h = int(H * cut_rat)
+
+    # uniform
+    cx = np.random.randint(W)
+    cy = np.random.randint(H)
+
+    bbx1 = np.clip(cx - cut_w // 2, 0, W)
+    bby1 = np.clip(cy - cut_h // 2, 0, H)
+    bbx2 = np.clip(cx + cut_w // 2, 0, W)
+    bby2 = np.clip(cy + cut_h // 2, 0, H)
+
+    return bbx1, bby1, bbx2, bby2
+
+# data:(b,c,w,h)
+# targets1~3:(b,),说明每张图中有3类目标
+# alpha,两张图片融合区域的大小
+# 返回这b个图随机两两融合的结果data:(b,c,w,h),和融合结果的标签
+# 我感觉融合结果的标签类别1应该是(targets1 + shuffled_targets1),类别2、3同理
+def cutmix(data, targets1, alpha):
+    # 对b这个维度进行随机打乱,产生随机序列indices
+    indices = torch.randperm(data.size(0))
+    shuffled_data = data[indices] # 这是打乱b后的数据,shape=(b,c,w,h)
+    shuffled_targets1 = targets1[indices] # 同上shape=(b,)
+
+    
+    # 基于 alpha 随机生成 lambda 值，它控制了两个图像的融合程度
+    lam = np.random.beta(alpha, alpha)
+    
+    # 随机生成一个矩形框 (bbx1, bby1) 和 (bbx2, bby2)，用于融合两张图像的区域
+    bbx1, bby1, bbx2, bby2 = rand_bbox(data.size(), lam)
+    
+    # 使用另一张图像的相应区域替换第一张图像的相应区域，实现图像融合
+    data[:, :, bbx1:bbx2, bby1:bby2] = data[indices, :, bbx1:bbx2, bby1:bby2]
+    
+    # adjust lambda to exactly match pixel ratio
+    # λ = 1 - (融合区域的像素数量 / 总图像像素数量)
+    # 基于现实对已给的λ进行一个调整
+    lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (data.size()[-1] * data.size()[-2]))
+
+    targets = [targets1, shuffled_targets1, lam]
+    return data, targets
+
+# 我感觉输入参数和输出参数含义同上
+def mixup(data, targets1, alpha):
+    indices = torch.randperm(data.size(0))
+    shuffled_data = data[indices]
+    shuffled_targets1 = targets1[indices]
+
+    lam = np.random.beta(alpha, alpha)
+    data = data * lam + shuffled_data * (1 - lam) # 我感觉是对于每个像素点都做该算法
+    targets = [targets1, shuffled_targets1, lam]
+
+    return data, targets
+
+# 被我猜中了，这里是1张图3个目标，因为经过cutmix，每个目标变得半人半马，于是求每个目标loss时需要用到2个标签，最后该图片的总loss是3个目标的loss和
+# preds1~3是预测出图中3个目标，对其softmax的概率向量
+# targets中有6个标签，其中2个为1组，代表一个目标的类别，最后一个是lam，代表cutmix的程度，求loss时可做半人半马的权重
+def cutmix_criterion(preds1, targets):
+    targets1, targets2, lam = targets[0], targets[1], targets[2]
+#     criterion = nn.CrossEntropyLoss(reduction='mean').cuda()
+    return lam * kl_loss(targets1 ,preds1) + (1 - lam) * kl_loss(targets2 ,preds1)
+
+# 同上
+def mixup_criterion(preds1, targets):
+    targets1, targets2, lam = targets[0], targets[1], targets[2]
+#     criterion = nn.CrossEntropyLoss(reduction='mean')
+    return lam * kl_loss(targets1 ,preds1) + (1 - lam) * kl_loss(targets2 ,preds1)
+
+
+def get_fold_train_val_indexes(indexes: np.ndarray, fold: int) -> tuple[np.ndarray, np.ndarray]:
     lower_bound = fold * len(indexes) // Config.num_folds
     upper_bound = (fold + 1) * len(indexes) // Config.num_folds
     
@@ -258,7 +336,7 @@ def objective(trial) -> float:
             drop_rate=dropout
         ).to(device)
         
-        model.load_state_dict(torch.load(f'/home/xyli/kaggle/efficientnet_b1_fold{fold}.pth'))
+        model.load_state_dict(torch.load(f'/kaggle/input/hms-efficientnet-b1/efficientnet_b1_fold{fold}.pth'))
         model = DataParallel(model)
         
         optimizer = optim.AdamW(
@@ -308,13 +386,41 @@ def objective(trial) -> float:
                 train_target:  torch.Size([16, 6])
                 train_pred:  torch.Size([16, 6])
                 """
-#                 print('train_target: ', train_target.shape)
                 
-                train_pred = model(train_batch)
                 
-#                 print('train_pred: ', train_pred.shape)
+                target = train_target
+                input = train_batch
+                random_number = random.random() # 生成一个0到1之间的随机数
+                if random_number < 0.3:
+                    input,targets=cutmix(input,target,0.2)
+
+                    targets[0]=torch.tensor(targets[0]).cuda()
+                    targets[1]=torch.tensor(targets[1]).cuda()
+                    targets[2]=torch.tensor(targets[2]).cuda()
+                elif random_number > 0.7:
+                    input,targets=mixup(input,target,0.2)
+
+                    targets[0]=torch.tensor(targets[0]).cuda()
+                    targets[1]=torch.tensor(targets[1]).cuda()
+                    targets[2]=torch.tensor(targets[2]).cuda()
+                else:
+                    None
                 
-                loss = kl_loss(train_target, train_pred)
+                
+                input = input.cuda()
+                target = target.cuda()
+                
+                output = model(input)
+                
+                loss=None
+                if random_number < 0.3:
+                    loss = cutmix_criterion(output, targets) # 注意这是在CPU上运算的
+                elif random_number > 0.7:
+                    loss = mixup_criterion(output, targets) # 注意这是在CPU上运算的
+                else:
+                    loss = kl_loss(target, output)
+
+                
                 loss.backward()
                 optimizer.step()
 
@@ -373,7 +479,6 @@ train_spectrogram_indexes = np.arange(len(train_features))
 np.random.shuffle(train_spectrogram_indexes)
     
 gc.collect()
-
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"Using device: {device}")
