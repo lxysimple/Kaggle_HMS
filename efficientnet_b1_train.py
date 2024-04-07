@@ -451,7 +451,7 @@ def objective(trial) -> float:
 
                 train_loss.append(loss.item())
 
-                print(f'epoch:{epoch}, idx:{idx:6d}, loss:{loss}') 
+                print(f'epoch:{epoch}, idx:{idx:6d}, loss:{loss:.6f}') 
 
             epoch_train_loss = np.mean(train_loss)
             train_losses.append(epoch_train_loss)
