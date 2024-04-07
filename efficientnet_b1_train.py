@@ -215,7 +215,7 @@ print('Config.dataset_wide_mean: ', Config.dataset_wide_mean)
 print('Config.dataset_wide_std: ', Config.dataset_wide_std)
 
 
-def get_fold_train_val_indexes(indexes: np.ndarray, fold: int) -> tuple[np.ndarray, np.ndarray]:
+def get_fold_train_val_indexes(indexes: np.ndarray, fold: int) -> Tuple[np.ndarray, np.ndarray]:
     lower_bound = fold * len(indexes) // Config.num_folds
     upper_bound = (fold + 1) * len(indexes) // Config.num_folds
     
