@@ -436,6 +436,8 @@ def objective(trial) -> float:
                 optimizer.step()
 
                 train_loss.append(loss.item())
+                
+                print(f'epoch:{epoch}, loss:{loss}')
 
             epoch_train_loss = np.mean(train_loss)
             train_losses.append(epoch_train_loss)
