@@ -349,7 +349,8 @@ def objective(trial) -> float:
         ).to(device)
         
         # model.load_state_dict(torch.load(f'/home/xyli/kaggle/efficientnet_b1_fold{fold}.pth'))
-        model.load_state_dict(torch.load(f'/home/xyli/kaggle/Kaggle_HMS/efficientnet_b1_fold{fold}.pth')['state_dict'],strict=False)
+        ckpt = torch.load(f'/home/xyli/kaggle/Kaggle_HMS/efficientnet_b1_fold{fold}.pth')
+        model.load_state_dict(ckpt['state_dict'],strict=False)
         model = DataParallel(model)
         
         optimizer = optim.AdamW(
