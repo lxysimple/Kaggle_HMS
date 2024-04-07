@@ -348,7 +348,8 @@ def objective(trial) -> float:
             drop_rate=dropout
         ).to(device)
         
-        model.load_state_dict(torch.load(f'/home/xyli/kaggle/efficientnet_b1_fold{fold}.pth'))
+        # model.load_state_dict(torch.load(f'/home/xyli/kaggle/efficientnet_b1_fold{fold}.pth'))
+        model.load_state_dict(torch.load(f'/home/xyli/kaggle/Kaggle_HMS/efficientnet_b1_fold{fold}.pth'))
         model = DataParallel(model)
         
         optimizer = optim.AdamW(
