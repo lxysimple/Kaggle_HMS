@@ -30,7 +30,7 @@ labels = ['seizure', 'lpd', 'gpd', 'lrda', 'grda', 'other']
 class Config:
     seed = 3131
     image_transform = transforms.Resize((512,512))
-    batch_size = 48
+    batch_size = 96
     num_epochs = 9
     num_folds = 5
     num_trials = 20
