@@ -363,9 +363,6 @@ def objective(trial) -> float:
             ckpt = torch.load(f'/home/xyli/kaggle/Kaggle_HMS/efficientnet_b1_fold{fold}.pth')
             model.load_state_dict(ckpt, strict=False)
 
-        
-
-
 
         model = DataParallel(model)
         
