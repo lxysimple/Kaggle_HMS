@@ -38,7 +38,7 @@ from scipy.signal import spectrogram as spectrogram_np
 
 import efficientnet.tfkeras as efn
 
-# sys.path.append(f'/home/xyli/kaggle/')
+sys.path.append(f'/home/xyli/kaggle/')
 from kaggle_kl_div import score
 
 ##################################################################################
