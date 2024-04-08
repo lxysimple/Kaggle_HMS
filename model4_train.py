@@ -176,7 +176,7 @@ class DataGenerator(tf.keras.utils.Sequence):
             eeg_id = row['eeg_id']
             spec_offset = int(row['spectrogram_label_offset_seconds_min'])
             eeg_offset = int(row['eeg_label_offset_seconds_min'])
-            file_path = f'/kaggle/input/3-diff-time-specs-hms/images/{eeg_id}_{spec_offset}_{eeg_offset}.npz'
+            file_path = f'/home/xyli/kaggle/images/{eeg_id}_{spec_offset}_{eeg_offset}.npz'
             data = np.load(file_path)
             eeg_data = data['final_image']
             eeg_data_expanded = np.repeat(eeg_data[:, :, np.newaxis], 3, axis=2)
@@ -199,7 +199,7 @@ def build_EfficientNetB0(input_shape=(512, 512, 3), num_classes=6):
     inp = tf.keras.Input(shape=input_shape)
 
     base_model = efn.EfficientNetB0(include_top=False, weights=None, input_shape=None)
-    base_model.load_weights(f'/kaggle/input/tf-efficientnet-imagenet-weights/efficientnet-b0_weights_tf_dim_ordering_tf_kernels_autoaugment_notop.h5')
+    base_model.load_weights(f'/home/xyli/kaggle/efficientnet-b0_weights_tf_dim_ordering_tf_kernels_autoaugment_notop.h5')
 
     # OUTPUT
     x = base_model(inp)
