@@ -38,14 +38,14 @@ from scipy.signal import spectrogram as spectrogram_np
 
 import efficientnet.tfkeras as efn
 
-sys.path.append(f'/home/xyli/kaggle/')
+# sys.path.append(f'/home/xyli/kaggle/')
 from kaggle_kl_div import score
 
 ##################################################################################
 
-sys.path += ["/opt/conda/envs/rapids/lib/python3.7/site-packages"]
-sys.path += ["/opt/conda/envs/rapids/lib/python3.7"]
-sys.path += ["/opt/conda/envs/rapids/lib"]
+# sys.path += ["/opt/conda/envs/rapids/lib/python3.7/site-packages"]
+# sys.path += ["/opt/conda/envs/rapids/lib/python3.7"]
+# sys.path += ["/opt/conda/envs/rapids/lib"]
 
 import cupy as cp
 import cusignal
