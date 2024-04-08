@@ -360,8 +360,8 @@ def objective(trial) -> float:
                 name = k[7:]  # 去掉前缀（去掉前七个字符）
                 new_state_dict[name] = v  # 新字典的key值对应的value为一一对应的值。
             model.load_state_dict(new_state_dict, strict=True)  # 重新加载这个模型
-            ckpt = torch.load(f'/home/xyli/kaggle/Kaggle_HMS/efficientnet_b1_fold{fold}.pth')
-            model.load_state_dict(ckpt, strict=False)
+            # ckpt = torch.load(f'/home/xyli/kaggle/Kaggle_HMS/efficientnet_b1_fold{fold}.pth')
+            # model.load_state_dict(ckpt, strict=False)
 
 
         model = DataParallel(model)
